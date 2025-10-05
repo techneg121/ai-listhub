@@ -68,11 +68,12 @@ def generate_description_openai(name: str, category: str, url: str) -> str:
     if not openai or not OPENAI_API_KEY:
         logging.warning("OpenAI is not configured - skipping description generation")
         return ""
-    prompt = f\"\"\"Write a concise 80-120 word SEO-friendly description for the AI tool below. Use an engaging tone, mention the primary use-case, and include a suggested 3-word tagline at the end in parentheses.
+    prompt = f"""Write a concise 80-120 word SEO-friendly description for the AI tool below. 
+Use an engaging tone, mention the primary use-case, and include a suggested 3-word tagline at the end in parentheses.
 Tool name: {name}
 Category: {category}
 URL: {url}
-Keep it human-readable and avoid marketing fluff.\"\"\"
+Keep it human-readable and avoid marketing fluff."""
     try:
         resp = openai.ChatCompletion.create(
             model="gpt-4o-mini",
@@ -88,7 +89,7 @@ Keep it human-readable and avoid marketing fluff.\"\"\"
         return ""
 
 def upsert_tool(record: dict, dry_run=False):
-    UPSERT_SQL = \"\"\"
+    UPSERT_SQL = """
 INSERT INTO tools (name, url, category, description, logo_url, tags, source)
 VALUES (%s, %s, %s, %s, %s, %s, %s)
 ON DUPLICATE KEY UPDATE
@@ -99,7 +100,7 @@ ON DUPLICATE KEY UPDATE
     tags=VALUES(tags),
     source=VALUES(source),
     updated_on=NOW();
-\"\"\"
+"""
     if dry_run:
         logging.info("[dry-run] Upsert: %s", record)
         return True
